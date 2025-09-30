@@ -5,6 +5,5 @@
         <fqname>IColorEnhancement/default</fqname>
         <fqname>IDisplayModes/default</fqname>
         <fqname>IPictureAdjustment/default</fqname>
-        <fqname>ISunlightEnhancement/default</fqname>
     </hal>
 </manifest>
