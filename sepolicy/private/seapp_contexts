@@ -1,2 +1,6 @@
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device.dac domain=dac_panel_app type=app_data_file levelFrom=all
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device domain=gestures_app type=app_data_file levelFrom=all
+user=_app isPrivApp=true seinfo=platform name=com.lge.ims domain=vendor_qtelephony type=radio_data_file levelFrom=all
+user=_app isPrivApp=true seinfo=platform name=.lgedataservice domain=vendor_dataservice_app type=radio_data_file levelFrom=all
+
+
