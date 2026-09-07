@@ -1,2 +1,10 @@
 # Sysfs
 /sys/devices/virtual/input/lge_touch/lpwg_notify                            u:object_r:sysfs_gestures:s0
+
+/(system|system_ext|system/system_ext)/bin/ipsecd u:object_r:ipsecd_exec:s0
+/(system|system_ext|system/system_ext)/bin/imsipsecclient u:object_r:imsipsecclient_exec:s0
+/(system|system_ext|system/system_ext)/bin/imsipsecstarter u:object_r:imsipsecstarter_exec:s0
+/(system|system_ext|system/system_ext)/bin/lge_ims_phone_provider u:object_r:lge_ims_phone_provider_exec:s0
+/(system|system_ext|system/system_ext)/bin/charon u:object_r:charon_exec:s0
+/(system|system_ext|system/system_ext)/bin/starter u:object_r:starter_exec:s0
+/(system|system_ext|system/system_ext)/bin/ipsec u:object_r:ipsec_exec:s0

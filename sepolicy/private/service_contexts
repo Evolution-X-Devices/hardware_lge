@@ -1,0 +1,27 @@
+# UICC
+lguicc u:object_r:radio_service:s0
+lguiccpbm u:object_r:radio_service:s0
+##
+
+# LAP
+lge_property u:object_r:lge_property_service:s0
+###
+
+# Telephony_Call_Framework
+callfwDebugService u:object_r:radio_service:s0
+lge_voip u:object_r:radio_service:s0
+lge_voip.registry u:object_r:radio_service:s0
+operator.dm u:object_r:radio_service:s0
+telephony_internalex u:object_r:radio_service:s0
+###
+
+# IMS
+com.lge.ims.phone u:object_r:ims_service:s0
+com.lge.server.ims.sms u:object_r:ims_service:s0
+# LGE_CHANGE [SMS_Patch_0621][VZW], LGP_MSG_SMS_SMS_TO_911
+com.lge.server.ims.sms.scbm u:object_r:ims_service:s0
+lgeims_mmpf u:object_r:ims_service:s0
+
+# Data
+lgdataruntimefeature u:object_r:lgdataruntimefeature_service:s0
+###

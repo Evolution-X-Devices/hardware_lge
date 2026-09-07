@@ -1,6 +1,8 @@
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device.dac domain=dac_panel_app type=app_data_file levelFrom=all
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device domain=gestures_app type=app_data_file levelFrom=all
-user=_app isPrivApp=true seinfo=platform name=com.lge.ims domain=vendor_qtelephony type=radio_data_file levelFrom=all
-user=_app isPrivApp=true seinfo=platform name=.lgedataservice domain=vendor_dataservice_app type=radio_data_file levelFrom=all
+user=_app isPrivApp=true seinfo=platform name=com.lge.ims domain=radio type=radio_data_file levelFrom=all
+user=_radio isPrivApp=true seinfo=platform name=.dataservices domain=radio type=radio_data_file levelFrom=all
+user=_radio isPrivApp=true seinfo=platform name=product.lge.data.server domain=radio type=radio_data_file levelFrom=all
+user=_app seinfo=platform name=org.codeaurora.ims isPrivApp=true domain=radio type=app_data_file levelFrom=all
 
 

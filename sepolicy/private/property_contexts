@@ -1,0 +1,11 @@
+persist.net.wo.				u:object_r:lge_ims_wo_prop:s0
+persist.product.lge.data.		u:object_r:lge_ims_data_prop:s0
+persist.product.lge.sar.ratpreference	u:object_r:lge_ims_sar_ratpreference_prop:s0 exact int
+net.iwlan_possible			u:object_r:lge_ims_iwlan_possible_prop:s0 exact int
+product.lge.data.iwlan.			u:object_r:lge_ims_data_prop:s0
+product.lge.ims.reg			u:object_r:lge_ims_reg_prop:s0 exact int
+net.wo.apntypes_in_epdgonlyapn		u:object_r:lge_wo_apntypes_prop:s0 exact string
+product.lge.data.iwlan.hosupport.ims	u:object_r:lge_iwlan_hosupport_prop:s0 exact int
+product.lge.data.iwlan.hosupport.roam.ims u:object_r:lge_iwlan_hosupport_roam_prop:s0 exact int
+product.lge.data.imscalltype		u:object_r:lge_ims_calltype_prop:s0 exact int
+persist.vendor.lge.			u:object_r:vendor_lge_misc_prop:s0
