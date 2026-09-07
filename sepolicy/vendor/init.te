@@ -14,6 +14,10 @@ allow init firmware_file:filesystem getattr;
 
 allow init encrypt_block_device:blk_file write;
 
+allow init debugfs_tracing_debug:dir mounton;
+allow init mnt_product_file:dir mounton;
+allow init functionfs:dir mounton;
+
 allow init sysfs_dac:{lnk_file file} { rw_file_perms setattr };
 allow init lge_ims_phone_provider_exec:file getattr;
 allow init ipsecd_socket:sock_file create_file_perms;
