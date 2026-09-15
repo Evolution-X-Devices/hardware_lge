@@ -1,0 +1,3 @@
+get_prop(ipsecd, lge_ims_wo_prop)
+get_prop(ipsecd, lge_ims_data_prop)
+hal_client_domain(ipsecd, hal_telephony)

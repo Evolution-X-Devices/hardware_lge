@@ -1,0 +1,8 @@
+binder_use(vendor_qtelephony)
+binder_call(vendor_qtelephony, imsipsecclient)
+allow vendor_qtelephony system_data_file:dir { getattr search };
+allow vendor_qtelephony ims_service:service_manager find;
+set_prop(vendor_qtelephony, lge_ims_reg_prop)
+
+get_prop(vendor_qtelephony, vendor_lge_misc_prop)
+get_prop(vendor_qtelephony, lge_ims_data_prop)

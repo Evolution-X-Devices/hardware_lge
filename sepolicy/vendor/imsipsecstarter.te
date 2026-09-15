@@ -1,0 +1,6 @@
+#allow imsipsecstarter property_socket sock_file { write };
+allow imsipsecstarter init:unix_stream_socket { connectto };
+init_daemon_domain(imsipsecstarter)
+add_service(ipsecd, ims_service)
+set_prop(imsipsecstarter, ctl_start_prop)
+set_prop(imsipsecstarter, ctl_stop_prop)

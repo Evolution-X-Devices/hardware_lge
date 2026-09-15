@@ -1,2 +1,6 @@
 # Sysfs
 type sysfs_gestures, sysfs_type, fs_type;
+
+type lge_ims_phone_provider_exec, system_file_type, exec_type, file_type;
+type ipsecd_exec, system_file_type, exec_type, file_type;
+init_daemon_domain(ipsecd)

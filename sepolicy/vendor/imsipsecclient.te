@@ -1,0 +1,4 @@
+binder_use(imsipsecclient)
+binder_call(imsipsecclient, vendor_qtelephony)
+add_service(ipsecd, ims_service)
+init_daemon_domain(imsipsecclient)

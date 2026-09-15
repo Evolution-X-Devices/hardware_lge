@@ -1,0 +1,8 @@
+set_prop(vendor_dataservice_app, lge_ims_wo_prop)
+set_prop(vendor_dataservice_app, lge_ims_data_prop)
+set_prop(vendor_dataservice_app, lge_ims_sar_ratpreference_prop)
+set_prop(vendor_dataservice_app, lge_ims_iwlan_possible_prop)
+set_prop(vendor_dataservice_app, lge_wo_apntypes_prop)
+set_prop(vendor_dataservice_app, lge_iwlan_hosupport_prop)
+set_prop(vendor_dataservice_app, lge_iwlan_hosupport_roam_prop)
+set_prop(vendor_dataservice_app, lge_ims_calltype_prop)

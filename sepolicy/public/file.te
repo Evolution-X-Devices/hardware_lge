@@ -1,0 +1,5 @@
+type ipsecd_socket, file_type, coredomain_socket;
+type ipsecd, domain, coredomain;
+type imsipsecclient, domain;
+type imsipsecstarter, domain;
+type ims_service, service_manager_type;

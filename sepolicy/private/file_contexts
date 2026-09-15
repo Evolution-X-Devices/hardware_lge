@@ -1,2 +1,7 @@
 # Sysfs
 /sys/devices/virtual/input/lge_touch/lpwg_notify                            u:object_r:sysfs_gestures:s0
+
+# LG IMS
+/(system|system_ext|system/system_ext)/bin/lge_ims_phone_provider u:object_r:lge_ims_phone_provider_exec:s0
+/(system|system_ext|system/system_ext)/bin/ipsecd u:object_r:ipsecd_exec:s0
+/dev/socket/ipsecd    u:object_r:ipsecd_socket:s0
