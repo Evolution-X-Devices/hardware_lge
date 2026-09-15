@@ -1,0 +1,3 @@
+get_prop(ipsecd, lge_ims_wo_prop)
+get_prop(ipsecd, lge_ims_data_prop)
+allow ipsecd default_android_hwservice:hwservice_manager find;

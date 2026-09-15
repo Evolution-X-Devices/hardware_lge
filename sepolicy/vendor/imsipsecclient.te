@@ -1,0 +1,1 @@
+allow imsipsecclient vendor_qtelephony:unix_dgram_socket { sendto };
