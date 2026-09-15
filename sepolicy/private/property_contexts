@@ -1,0 +1,2 @@
+persist.product.lge.sar.ratpreference   u:object_r:lge_ims_prop:s0
+net.iwlan_possible                      u:object_r:lge_ims_prop:s0

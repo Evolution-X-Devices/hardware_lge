@@ -1,0 +1,11 @@
+type ipsecd, domain;
+type imsipsecstarter, domain;
+type imsipsecclient, domain;
+type lge_ims_phone_provider, domain;
+
+domain_auto_trans(init, ipsecd_exec, ipsecd)
+domain_auto_trans(init, imsipsecstarter_exec, imsipsecstarter)
+domain_auto_trans(init, imsipsecclient_exec, imsipsecclient)
+domain_auto_trans(init, lge_ims_phone_provider_exec, lge_ims_phone_provider)
+
+

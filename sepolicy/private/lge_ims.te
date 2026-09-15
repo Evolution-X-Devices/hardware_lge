@@ -1,0 +1,22 @@
+type lge_ims, domain;
+type lge_ims_prop, property_type;
+type lge_ims_phone_service, service_manager_type;
+
+allow lge_ims system_ext_app_file:dir { search read open };
+allow lge_ims system_ext_app_file:file { read open execute getattr map };
+allow lge_ims system_ext_lib_file:file { read open execute getattr map };
+
+allow lge_ims self:capability { net_raw net_admin };
+allow lge_ims radio_service:service_manager find;
+allow lge_ims net_radio_service:service_manager find;
+allow lge_ims hwservicemanager:binder { call transfer };
+allow lge_ims hal_telephony_hwservice:hwservice_manager find;
+allow ipsecd ipsecd_exec:file { entrypoint read execute map };
+
+allow imsipsecstarter imsipsecstarter_exec:file { entrypoint read execute map };
+allow imsipsecclient imsipsecclient_exec:file { entrypoint read execute map };
+allow lge_ims_phone_provider lge_ims_phone_provider_exec:file { entrypoint read execute map };
+
+set_prop(lge_ims, lge_ims_prop)
+get_prop(lge_ims, lge_ims_prop)
+add_service(lge_ims, lge_ims_phone_service)

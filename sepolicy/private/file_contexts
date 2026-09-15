@@ -1,2 +1,12 @@
 # Sysfs
 /sys/devices/virtual/input/lge_touch/lpwg_notify                            u:object_r:sysfs_gestures:s0
+
+# IPSec & IWLAN Binaries
+/system_ext/bin/imsipsecclient          u:object_r:imsipsecclient_exec:s0
+/system_ext/bin/imsipsecstarter         u:object_r:imsipsecstarter_exec:s0
+/system_ext/bin/ipsecd                  u:object_r:ipsecd_exec:s0
+/system_ext/bin/lge_ims_phone_provider  u:object_r:lge_ims_phone_provider_exec:s0
+
+# LG IMS APK & Shim Libraries 
+/system_ext/priv-app/Ims6(/.*)?         u:object_r:system_ext_app_file:s0
+/system_ext/priv-app/Ims6/lib(/.*)?     u:object_r:system_ext_lib_file:s0
