@@ -1,0 +1,80 @@
+type ipsecd, domain, coredomain;
+type ipsecd_exec, system_file_type, exec_type, file_type;
+type ipsec_data_file, file_type, data_file_type, core_data_file_type; 
+init_daemon_domain(ipsecd)
+net_domain(ipsecd)
+binder_use(ipsecd)
+
+domain_auto_trans(ipsecd, netutils_wrapper_exec, netutils_wrapper)
+allow netutils_wrapper ipsecd_socket:unix_stream_socket { read write };
+allow netutils_wrapper ipsecd:netlink_xfrm_socket { read write };
+allow netutils_wrapper ipsecd:fifo_file { read write };
+allow netutils_wrapper ipsecd:fd use;
+
+allow ipsecd self:tun_socket { create relabelfrom relabelto };
+
+allow ipsecd self:netlink_xfrm_socket {
+    bind create getopt setopt
+    nlmsg_read nlmsg_write
+    read write connect getattr
+};
+allow ipsecd self:netlink_route_socket {
+    bind create getopt setopt
+    nlmsg_read nlmsg_readpriv nlmsg_write
+    read write
+};
+
+allow ipsecd self:rawip_socket create_socket_perms;
+allow ipsecd self:udp_socket create_socket_perms;
+allow ipsecd self:key_socket { create read write setopt };
+allow ipsecd node:udp_socket node_bind;
+allow ipsecd port:udp_socket name_bind;
+
+allow ipsecd ipsecd_socket:unix_stream_socket {
+    accept connectto getattr getopt listen read write
+};
+allow ipsecd ipsecd_socket:unix_dgram_socket { getattr read write };
+allow ipsecd ipsecd_socket:sock_file write;
+
+allow ipsecd self:capability { net_admin net_raw net_bind_service };
+allow ipsecd self:capability { chown kill setgid };
+allow ipsecd self:capability2 wake_alarm;
+allow ipsecd self:netlink_xfrm_socket getattr;
+
+allow ipsecd tun_device:chr_file { ioctl read write getattr lock append map open watch watch_reads };
+allowxperm ipsecd tun_device:chr_file ioctl { 0x54ca-0x54cb };
+
+
+allow ipsecd ipsec_data_file:dir create_dir_perms;
+allow ipsecd ipsec_data_file:file create_file_perms;
+allow ipsecd ipsec_data_file:lnk_file create_file_perms;
+
+allow ipsecd vpn_data_file:dir create_dir_perms;
+allow ipsecd vpn_data_file:file create_file_perms;
+allow ipsecd vpn_data_file:sock_file create_file_perms;
+
+allow ipsecd net_data_file:dir search;
+allow ipsecd net_data_file:file { getattr open read };
+
+allow ipsecd proc_net:file { getattr open read };
+allow ipsecd proc_modules:file getattr;
+
+allow ipsecd sysfs_wake_lock:file { getattr open read write };
+
+allow ipsecd system_file:file execute_no_trans;
+
+allow ipsecd property_socket:sock_file write;
+allow ipsecd init:unix_stream_socket connectto;
+
+get_prop(ipsecd, lge_ims_wo_prop)
+get_prop(ipsecd, lge_ims_data_prop)
+get_prop(ipsecd, vendor_lge_misc_prop)
+set_prop(ipsecd, lge_ims_wo_prop)
+
+
+allow ipsecd system_suspend:binder { call transfer };
+allow system_suspend ipsecd:binder { transfer };
+allow ipsecd hal_system_suspend_service:service_manager find;
+allow ipsecd system_suspend_hwservice:hwservice_manager find;
+
+

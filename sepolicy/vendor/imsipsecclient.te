@@ -1,0 +1,10 @@
+type imsipsecclient, domain;
+typeattribute imsipsecclient mlstrustedsubject;
+
+binder_use(imsipsecclient)
+binder_call(imsipsecclient, lge_ims_app)
+add_service(lge_ims_app, ims_service)
+init_daemon_domain(imsipsecclient)
+allow imsipsecclient self:capability net_admin;
+allow imsipsecclient self:netlink_xfrm_socket { bind create getattr nlmsg_write read setopt write };
+allow imsipsecclient lge_ims_app:unix_dgram_socket sendto;

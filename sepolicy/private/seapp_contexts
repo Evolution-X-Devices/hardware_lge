@@ -1,2 +1,4 @@
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device.dac domain=dac_panel_app type=app_data_file levelFrom=all
 user=_app isPrivApp=true seinfo=platform name=org.lineageos.settings.device domain=gestures_app type=app_data_file levelFrom=all
+user=_app seinfo=platform name=com.lge.ims isPrivApp=true domain=lge_ims_app type=app_data_file levelFrom=all
+user=_app seinfo=platform name=.lgedataservice domain=lge_dataservice_app type=app_data_file levelFrom=all
