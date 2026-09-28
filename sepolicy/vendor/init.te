@@ -1,1 +1,4 @@
 allow init sysfs_dac:{lnk_file file} { rw_file_perms setattr };
+allow init lge_ims_phone_provider_exec:file getattr;
+allow init ipsecd_socket:sock_file create_file_perms;
+allow init ipsecd_socket:unix_stream_socket { bind create listen };

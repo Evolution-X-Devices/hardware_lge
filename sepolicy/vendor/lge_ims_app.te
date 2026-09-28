@@ -1,0 +1,38 @@
+type lge_ims_app, domain, appdomain;
+app_domain(lge_ims_app)
+net_domain(lge_ims_app)
+
+# IMS sockets
+allow lge_ims_app imsipsecclient:unix_dgram_socket sendto;
+allow lge_ims_app imsipsecstarter:unix_dgram_socket sendto;
+
+binder_use(lge_ims_app)
+binder_call(lge_ims_app, imsipsecclient)
+binder_call(lge_ims_app, hal_vssims_default)
+
+allow lge_ims_app ims_service:service_manager find;
+allow lge_ims_app activity_service:service_manager find;
+allow lge_ims_app gpu_service:service_manager find;
+allow lge_ims_app netstats_service:service_manager find;
+allow lge_ims_app radio_service:service_manager find;
+allow lge_ims_app registry_service:service_manager find;
+allow lge_ims_app thermal_service:service_manager find;
+allow lge_ims_app statusbar_service:service_manager find;
+allow lge_ims_app cameraserver_service:service_manager find;
+allow lge_ims_app telecom_service:service_manager find;
+allow lge_ims_app audioserver_service:service_manager find;
+allow lge_ims_app device_state_service:service_manager find;
+allow lge_ims_app app_api_service:service_manager find;
+
+# HALs
+allow lge_ims_app hal_lge_vssims_hwservice:hwservice_manager find;
+allow lge_ims_app hal_lgdata_hwservice:hwservice_manager find;
+allow lge_ims_app hal_lge_touch_hwservice:hwservice_manager find;
+allow lge_ims_app hal_lge_soi_hwservice:hwservice_manager find;
+
+allow lge_ims_app system_data_file:dir { getattr search };
+
+# Properties
+set_prop(lge_ims_app, lge_ims_reg_prop)
+get_prop(lge_ims_app, vendor_lge_misc_prop)
+get_prop(lge_ims_app, lge_ims_data_prop)
