@@ -1,0 +1,8 @@
+# IPsecd
+type ipsecd_socket, file_type, coredomain_socket;
+typeattribute ipsecd_socket mlstrustedobject;
+# LG IMS Service
+type ims_service, service_manager_type;
+typeattribute ims_service app_api_service;
+type lge_ims_phone_provider_exec, system_file_type, exec_type, file_type;
+type lge_ims_phone_provider, domain;
