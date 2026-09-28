@@ -1,0 +1,9 @@
+type imsipsecstarter, domain;
+
+typeattribute imsipsecstarter mlstrustedsubject;
+
+allow imsipsecstarter init:unix_stream_socket { connectto };
+allow lge_ims_app imsipsecstarter:unix_dgram_socket sendto;
+init_daemon_domain(imsipsecstarter)
+set_prop(imsipsecstarter, ctl_start_prop)
+set_prop(imsipsecstarter, ctl_stop_prop)

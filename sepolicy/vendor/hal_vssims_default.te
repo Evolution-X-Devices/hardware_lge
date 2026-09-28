@@ -6,3 +6,6 @@ init_daemon_domain(hal_vssims_default)
 
 allow hal_vssims_default hal_vssims_default:qipcrtr_socket create;
 allow hal_vssims_default self:socket create;
+
+allow hal_vssims_default self:qipcrtr_socket { getattr read setopt write };
+binder_call(hal_vssims_default, lge_ims_app)

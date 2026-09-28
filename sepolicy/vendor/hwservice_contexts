@@ -4,3 +4,6 @@ vendor.lge.hardware.vss_ims::IVssIms                                    u:object
 
 # Custom additions
 vendor.lge.hardware.audio.dac.control::IDacControl                  u:object_r:hal_dac_control_hwservice:s0
+
+vendor.lge.hardware.touch::ITouch  u:object_r:hal_lge_touch_hwservice:s0
+vendor.lge.hardware.soi::ISoi      u:object_r:hal_lge_soi_hwservice:s0
