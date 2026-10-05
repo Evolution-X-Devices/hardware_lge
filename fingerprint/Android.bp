@@ -1,0 +1,10 @@
+//
+// SPDX-FileCopyrightText: The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
+//
+
+cc_library_static {
+    name: "libudfps_extension.lge",
+    srcs: ["UdfpsExtension.cpp"],
+    include_dirs: ["frameworks/native/services/surfaceflinger/CompositionEngine/include"],
+}
