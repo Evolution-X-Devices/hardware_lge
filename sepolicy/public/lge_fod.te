@@ -1,0 +1,2 @@
+type lge_fod, domain;
+type lge_fod_socket, file_type, coredomain_socket;
