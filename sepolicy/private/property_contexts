@@ -20,3 +20,6 @@ product.lge.data.iwlan.hosupport.roam.ims	u:object_r:lge_iwlan_hosupport_roam_pr
 product.lge.data.imscalltype			u:object_r:lge_ims_calltype_prop:s0 exact int
 persist.product.lge.ims.volte_open		u:object_r:lge_ims_reg_prop:s0 exact int
 net.wo.						u:object_r:lge_ims_wo_prop:s0
+
+# LG AI Sound
+persist.lge.audio.aisound   u:object_r:lge_aisound_prop:s0
