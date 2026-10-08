@@ -1,0 +1,4 @@
+# Allow mdm_helper to create lgeimg.mbn in the vendor tombstones dir
+allow vendor_mdm_helper vendor_tombstone_data_file:dir create_dir_perms;
+allow vendor_mdm_helper vendor_tombstone_data_file:file create_file_perms;
+allow vendor_mdm_helper vendor_tombstone_data_file:file rw_file_perms;
