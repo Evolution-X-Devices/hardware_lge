@@ -81,3 +81,7 @@
 # LG IMS
 /(vendor|system/vendor)/bin/imsipsecclient u:object_r:imsipsecclient_exec:s0
 /(vendor|system/vendor)/bin/imsipsecstarter u:object_r:imsipsecstarter_exec:s0
+
+
+# Data files
+/data/per_boot(/.*)?                                                 u:object_r:per_boot_file:s0
