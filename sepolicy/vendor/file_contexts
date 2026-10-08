@@ -84,3 +84,6 @@
 
 # LG Camera
 /(vendor|system/vendor)/etc/camera(/.*)?    	u:object_r:vendor_configs_file:s0
+
+# Data files
+/data/per_boot(/.*)?                                                 u:object_r:per_boot_file:s0
