@@ -37,6 +37,8 @@
 
 # LG
 /mnt/vendor/absolute(/.*)? u:object_r:abt_pers_data_file:s0
+/dev/block/bootdevice/by-name/ftm	u:object_r:vendor_efs_boot_dev:s0
+/dev/block/sda8				u:object_r:vendor_efs_boot_dev:s0
 
 # OP files
 /vendor/OP(/.*)?       u:object_r:op_file:s0
