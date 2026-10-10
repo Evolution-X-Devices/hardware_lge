@@ -14,3 +14,8 @@
 /data/ipsec(/.*)?                         u:object_r:ipsec_data_file:s0
 /data/ipsec/wo(/.*)?                      u:object_r:ipsec_data_file:s0
 /data/ipsec/cacerts(/.*)?                 u:object_r:ipsec_data_file:s0
+
+#LG Camera
+
+/(system_ext|system/system_ext)/etc/camera/solution_config.xml	u:object_r:camera_configs_file:s0
+/(system_ext|system/system_ext)/etc/camera/camera_config.xml	u:object_r:camera_configs_file:s0

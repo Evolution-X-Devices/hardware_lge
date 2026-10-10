@@ -1,0 +1,3 @@
+allow platform_app camera_configs_file:file { getattr open read map execute };
+allow platform_app persist_lg_camera_file:dir { read open map getattr search };
+allow platform_app persist_lg_camera_file:file { read open map getattr };
