@@ -78,10 +78,13 @@
 
 # Sysfs - USB
 /sys/devices/platform/vendor/vendor:lge_usb_ds3/extcon/extcon5/cable.0(/.*)? u:object_r:sysfs_lge_usb:s0
+
 # LG IMS
 /(vendor|system/vendor)/bin/imsipsecclient u:object_r:imsipsecclient_exec:s0
 /(vendor|system/vendor)/bin/imsipsecstarter u:object_r:imsipsecstarter_exec:s0
 
-
 # Data files
 /data/per_boot(/.*)?                                                 u:object_r:per_boot_file:s0
+
+#LG Camera
+/(vendor|system/vendor)/etc/camera(/.*)?    	u:object_r:camera_configs_file:s0

@@ -19,3 +19,10 @@ get_prop(hal_camera_default, vendor_lge_misc_prop)
 # Debug use
 dontaudit hal_camera_default vendor_shell_exec:file { execute_no_trans };
 dontaudit hal_camera_default property_type:file read;
+
+# LG Camera
+allow hal_camera_default camera_configs_file file { getattr open read map execute }
+allow hal_camera_default persist_lg_camera_file:dir { add_name write };
+allow hal_camera_default persist_lg_camera_file:file create;
+allow hal_camera_default persist_lg_data_file:file setattr;
+
