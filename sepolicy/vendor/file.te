@@ -9,7 +9,6 @@ type op_audio_file, file_type, vendor_file_type;
 type firmware_data_file, file_type;
 type qseesfs_data_file, file_type;
 type persist_lg_audio_file, file_type;
-type persist_lg_camera_file, file_type;
 type persist_lg_data_file, file_type;
 type persist_lg_fingerprint_file, file_type;
 type persist_lg_wlan_file, file_type;

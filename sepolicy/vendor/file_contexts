@@ -81,3 +81,6 @@
 # LG IMS
 /(vendor|system/vendor)/bin/imsipsecclient u:object_r:imsipsecclient_exec:s0
 /(vendor|system/vendor)/bin/imsipsecstarter u:object_r:imsipsecstarter_exec:s0
+
+# LG Camera
+/(vendor|system/vendor)/etc/camera(/.*)?    	u:object_r:vendor_configs_file:s0
