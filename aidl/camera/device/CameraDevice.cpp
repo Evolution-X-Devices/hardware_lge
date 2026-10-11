@@ -10,6 +10,60 @@
 #include "convert.h"
 
 #include <cutils/trace.h>
+#include <system/camera_metadata.h>
+
+namespace {
+
+// LGE: the HAL reports a malformed ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS
+// entry for the logical (optic) cameras 5-9. Write the physical IDs as plain
+// NUL terminated ASCII strings. Do not keep the old HIDL padding (leading zero
+// bytes): Android 17's Java layer then sees an empty physical ID "" and drops
+// every capture result (preview freezes).
+void repairLogicalPhysicalIds(int cameraId,
+                              aidl::android::hardware::camera::device::CameraMetadata* out) {
+    static const uint8_t kIds2[] = {'2', 0};
+    static const uint8_t kIds0[] = {'0', 0};
+    static const uint8_t kIds04[] = {'0', 0, '4', 0};
+
+    const uint8_t* ids = nullptr;
+    size_t count = 0;
+    switch (cameraId) {
+        case 5:
+            ids = kIds2;
+            count = sizeof(kIds2);
+            break;
+        case 6:
+        case 7:
+            ids = kIds0;
+            count = sizeof(kIds0);
+            break;
+        case 8:
+        case 9:
+            ids = kIds04;
+            count = sizeof(kIds04);
+            break;
+        default:
+            return;
+    }
+
+    if (out == nullptr || out->metadata.empty()) {
+        return;
+    }
+    auto* meta = reinterpret_cast<camera_metadata_t*>(out->metadata.data());
+    camera_metadata_entry_t entry;
+    if (find_camera_metadata_entry(meta, ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS, &entry) != 0) {
+        ALOGE("%s: camera %d has no physical-ID entry", __FUNCTION__, cameraId);
+        return;
+    }
+    // Update in place: the entry already has the stock sized allocation.
+    if (update_camera_metadata_entry(meta, entry.index, ids, count, nullptr) != 0) {
+        ALOGE("%s: camera %d physical-ID repair failed", __FUNCTION__, cameraId);
+        return;
+    }
+    ALOGI("%s: repaired camera %d physical-ID bytes (count=%zu)", __FUNCTION__, cameraId, count);
+}
+
+}  // namespace
 
 namespace android {
 namespace hardware {
@@ -67,6 +121,7 @@ ndk::ScopedAStatus CameraDevice::getCameraCharacteristics(CameraMetadata* _aidl_
         int ret = mModule->getCameraInfo(mCameraIdInt, &info);
         if (ret == OK) {
             convertToAidl(info.static_camera_characteristics, _aidl_return);
+            repairLogicalPhysicalIds(mCameraIdInt, _aidl_return);
         } else {
             ALOGE("%s: get camera info failed!", __FUNCTION__);
             status = Status::INTERNAL_ERROR;
