@@ -48,7 +48,16 @@ Return<void> LgeRadioCompat::setResponseFunctions(const sp<V1_0::IRadioResponse>
     CHECK(callbacks);
     bindCallbacks(*mResponse, callbacks->response());
     bindCallbacks(*mIndication, callbacks->indication());
-    mExtension->setResponseFunctions(mLgeResponse, mLgeIndication).assertOk();
+
+    // The LG extension is optional. Without it, this compat still forwards
+    // every standard radio response and indication; only LG-proprietary
+    // signal reporting is lost for this slot.
+    if (mExtension != nullptr) {
+        mExtension->setResponseFunctions(mLgeResponse, mLgeIndication).assertOk();
+    } else {
+        LOG(WARNING) << "Running without ILgeRadio; LG signal reporting disabled for this slot";
+    }
+
     return mRadio->setResponseFunctions(mResponse, mIndication);
 }
 
