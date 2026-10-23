@@ -1,0 +1,19 @@
+# IMS sockets
+allow vendor_qtelephony imsipsecclient:unix_dgram_socket sendto;
+
+allow vendor_qtelephony imsipsecstarter:unix_dgram_socket sendto;
+
+binder_call(vendor_qtelephony, imsipsecclient)
+
+allow vendor_qtelephony ims_service:service_manager find;
+
+allow vendor_qtelephony system_data_file:dir { getattr search };
+
+add_service(vendor_qtelephony, ims_service)
+
+# Properties
+set_prop(vendor_qtelephony, lge_ims_reg_prop)
+
+get_prop(vendor_qtelephony, vendor_lge_misc_prop)
+
+get_prop(vendor_qtelephony, lge_ims_data_prop)

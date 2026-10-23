@@ -1,2 +1,6 @@
 # Sysfs
 type sysfs_gestures, sysfs_type, fs_type;
+
+# LG IMS
+type imsipsecstarter_exec, exec_type, system_file_type, file_type;
+type imsipsecclient_exec, exec_type, system_file_type, file_type;

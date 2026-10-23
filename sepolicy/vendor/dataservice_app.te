@@ -1,0 +1,12 @@
+# HAL
+
+allow vendor_dataservice_app hal_lgdata_hwservice:hwservice_manager find;
+
+allow vendor_dataservice_app hal_lge_vssims_hwservice:hwservice_manager find;
+
+allow vendor_dataservice_app hal_lgdata_hwservice:hwservice_manager find;
+
+hal_client_domain(vendor_dataservice_app, hal_lgdata)
+
+binder_call(vendor_dataservice_app, hal_vssims_default)
+
