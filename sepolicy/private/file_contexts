@@ -6,14 +6,15 @@
 /sys/devices/virtual/input/lge_touch/lpwg_notify                            u:object_r:sysfs_gestures:s0
 
 # LG IMS
-/(system|system_ext|system/system_ext)/bin/lge_ims_phone_provider u:object_r:lge_ims_phone_provider_exec:s0
-/(system|system_ext|system/system_ext)/bin/ipsecd u:object_r:ipsecd_exec:s0
-/dev/socket/wod_action  u:object_r:ipsecd_socket:s0
-/dev/socket/wod_sim     u:object_r:ipsecd_socket:s0
-/dev/socket/wod_ipsec   u:object_r:ipsecd_socket:s0
-/data/ipsec(/.*)?                         u:object_r:ipsec_data_file:s0
-/data/ipsec/wo(/.*)?                      u:object_r:ipsec_data_file:s0
-/data/ipsec/cacerts(/.*)?                 u:object_r:ipsec_data_file:s0
+/(system|system_ext|system/system_ext)/bin/ipsecd			u:object_r:ipsecd_exec:s0
+/dev/socket/wod_action							u:object_r:ipsecd_socket:s0
+/dev/socket/wod_sim							u:object_r:ipsecd_socket:s0
+/dev/socket/wod_ipsec 							u:object_r:ipsecd_socket:s0
+/data/ipsec(/.*)?							u:object_r:ipsec_data_file:s0
+/data/ipsec/wo(/.*)?							u:object_r:ipsec_data_file:s0
+/data/ipsec/cacerts(/.*)?						u:object_r:ipsec_data_file:s0
+/(system_ext|system/system_ext)/bin/imsipsecclient			u:object_r:imsipsecclient_exec:s0
+/(system_ext|system/system_ext)/bin/imsipsecstarter			u:object_r:imsipsecstarter_exec:s0
 
 #LG Camera
 /(system_ext|system/system_ext)/etc/camera/solution_config.xml	u:object_r:camera_configs_system_file:s0
