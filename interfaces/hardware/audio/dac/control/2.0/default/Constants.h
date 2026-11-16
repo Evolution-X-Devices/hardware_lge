@@ -46,6 +46,14 @@
 #define PROPERTY_CUSTOM_FILTER_SYMMETRY "persist.vendor.audio.ess.customFilterSymmetry"
 extern std::vector<std::string> PROPERTY_CUSTOM_FILTER_COEFFS;
 
+#define PROPERTY_AUDIO_64BIT "persist.vendor.audio.ess.audio64bit"
+#define PROPERTY_DSD_REMASTER "persist.vendor.audio.ess.dsd_remaster"
+#define PROPERTY_BIT_PERFECT "persist.vendor.audio.ess.bit_perfect"
+#define PROPERTY_SAMPLE_RATE "persist.vendor.audio.ess.sample_rate"
+#define PROPERTY_EQ_ENABLED "persist.vendor.audio.ess.eq_enabled"
+#define PROPERTY_EQ_PRESET "persist.vendor.audio.ess.eq_preset"
+extern std::vector<std::string> PROPERTY_EQ_BANDS;
+
 #ifndef PROPRIETARY_AUDIO_MODULE
 #define PROPERTY_VALUE_HIFI_DAC_ENABLED "true"
 #define PROPERTY_VALUE_HIFI_DAC_DISABLED "false"
@@ -64,3 +72,11 @@ extern std::vector<std::string> PROPERTY_CUSTOM_FILTER_COEFFS;
 #define SET_DAC_OFF_COMMAND "off"
 
 #define SET_SOUND_PRESET_COMMAND "SOUND_PRESET"
+#define SET_AUDIO_64BIT_COMMAND "hifi_64bit"
+#define SET_DSD_DOP_COMMAND "hifi_dac_dop"
+#define SET_DSD_REMASTER_COMMAND "dsd_remaster"
+#define SET_BIT_PERFECT_COMMAND "bit_perfect"
+#define SET_SAMPLE_RATE_COMMAND "out_sample_rate"
+#define SET_GEQ_ON_COMMAND "op_geq_on"
+#define SET_GEQ_PRESET_COMMAND "op_geq_preset"
+#define SET_GEQ_BAND_PREFIX "op_geq_band"

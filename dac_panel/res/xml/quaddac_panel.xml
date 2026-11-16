@@ -48,6 +48,120 @@
             app:entryValues="@array/digital_filter_entry_values"
             app:isPreferenceVisible="false" />
 
+        <SwitchPreference
+            app:key="bit_perfect_switch"
+            app:title="@string/bit_perfect"
+            app:summary="@string/bit_perfect_summary"
+            app:isPreferenceVisible="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/eq_category_title">
+
+        <SwitchPreference
+            app:key="eq_switch"
+            app:title="@string/eq_enable"
+            app:summary="@string/eq_enable_summary"
+            app:isPreferenceVisible="false" />
+
+        <ListPreference
+            app:key="eq_preset_dropdown"
+            app:title="@string/eq_preset"
+            app:summary="%s"
+            app:entries="@array/eq_preset_entries"
+            app:entryValues="@array/eq_preset_entries"
+            app:isPreferenceVisible="false" />
+
+        <Preference
+            app:key="eq_load_preset"
+            app:title="@string/eq_load_preset"
+            app:summary="@string/eq_load_preset_summary"
+            app:isPreferenceVisible="false" />
+
+        <Preference
+            app:key="eq_save_preset"
+            app:title="@string/eq_save_preset"
+            app:summary="@string/eq_save_preset_summary"
+            app:isPreferenceVisible="false" />
+
+        <Preference
+            app:key="eq_reset"
+            app:title="@string/eq_reset"
+            app:summary="@string/eq_reset_summary"
+            app:isPreferenceVisible="false" />
+
+        <SeekBarPreference
+            app:key="eq_band0"
+            app:title="@string/eq_band_31"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band1"
+            app:title="@string/eq_band_62"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band2"
+            app:title="@string/eq_band_125"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band3"
+            app:title="@string/eq_band_250"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band4"
+            app:title="@string/eq_band_500"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band5"
+            app:title="@string/eq_band_1k"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band6"
+            app:title="@string/eq_band_2k"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band7"
+            app:title="@string/eq_band_4k"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band8"
+            app:title="@string/eq_band_8k"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+        <SeekBarPreference
+            app:key="eq_band9"
+            app:title="@string/eq_band_16k"
+            app:min="-12"
+            android:max="12"
+            app:defaultValue="0"
+            app:isPreferenceVisible="false" />
+
     </PreferenceCategory>
 
     <!-- Customizable filter category -->

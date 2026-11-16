@@ -57,4 +57,62 @@
     <string name="avc_volume">AVC Volume</string>
     <string name="avc_volume_summary">Amplifies volume</string>
 
+    <string name="audio_64bit">Force 32-bit Audio</string>
+    <string name="audio_64bit_summary">Force 32-bit high-precision audio processing on the Quad DAC</string>
+
+    <string name="dsd_remaster">DSD Remastering</string>
+    <string name="dsd_remaster_off">Off</string>
+    <string name="dsd_remaster_dsd64">DSD64 (2.8 MHz)</string>
+    <string name="dsd_remaster_dsd128">DSD128 (5.6 MHz)</string>
+
+    <string name="bit_perfect">Bit-Perfect Audio</string>
+    <string name="bit_perfect_summary">Bypass resampling, EQ, and digital attenuation for direct DAC playback</string>
+
+    <string name="sample_rate">DAC Sample Rate</string>
+    <string name="sample_rate_auto">Auto (Native)</string>
+    <string name="sample_rate_44100">44.1 kHz</string>
+    <string name="sample_rate_48000">48 kHz</string>
+    <string name="sample_rate_88200">88.2 kHz</string>
+    <string name="sample_rate_96000">96 kHz</string>
+    <string name="sample_rate_176400">176.4 kHz</string>
+    <string name="sample_rate_192000">192 kHz</string>
+    <string name="sample_rate_352800">352.8 kHz</string>
+    <string name="sample_rate_384000">384 kHz</string>
+
+    <string name="eq_category_title">DAC Equalizer</string>
+    <string name="eq_enable">Enable DAC Equalizer</string>
+    <string name="eq_enable_summary">10-band equalizer active only on Hi-Fi Quad DAC</string>
+    <string name="eq_preset">EQ Preset</string>
+    <string name="eq_preset_flat">Flat</string>
+    <string name="eq_preset_bass_boost">Bass Boost</string>
+    <string name="eq_preset_treble_boost">Treble Boost</string>
+    <string name="eq_preset_vocal">Vocal</string>
+    <string name="eq_preset_rock">Rock</string>
+    <string name="eq_preset_pop">Pop</string>
+    <string name="eq_preset_jazz">Jazz</string>
+    <string name="eq_preset_classical">Classical</string>
+    <string name="eq_preset_custom">Custom</string>
+    <string name="eq_load_preset">Load EQ Preset</string>
+    <string name="eq_load_preset_summary">Load from saved presets or import a preset file (.json / .txt)</string>
+    <string name="eq_save_preset">Save EQ Preset</string>
+    <string name="eq_save_preset_summary">Save current 10-band curve as a reusable preset</string>
+    <string name="eq_reset">Reset EQ to Flat</string>
+    <string name="eq_reset_summary">Reset all 10 bands to 0 dB</string>
+    <string name="eq_load_from_file">Import from file…</string>
+    <string name="eq_save_dialog_title">Save EQ Preset</string>
+    <string name="eq_save_dialog_hint">Preset name</string>
+    <string name="eq_preset_loaded">Loaded EQ preset: %1$s</string>
+    <string name="eq_preset_saved">Saved EQ preset: %1$s</string>
+    <string name="eq_preset_load_failed">Failed to load EQ preset</string>
+    <string name="eq_band_31">31 Hz</string>
+    <string name="eq_band_62">62 Hz</string>
+    <string name="eq_band_125">125 Hz</string>
+    <string name="eq_band_250">250 Hz</string>
+    <string name="eq_band_500">500 Hz</string>
+    <string name="eq_band_1k">1 kHz</string>
+    <string name="eq_band_2k">2 kHz</string>
+    <string name="eq_band_4k">4 kHz</string>
+    <string name="eq_band_8k">8 kHz</string>
+    <string name="eq_band_16k">16 kHz</string>
+
 </resources>
