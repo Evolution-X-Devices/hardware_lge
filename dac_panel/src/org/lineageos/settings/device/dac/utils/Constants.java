@@ -16,6 +16,25 @@ public class Constants {
     public static final String HIFI_MODE_KEY = "hifi_mode_dropdown";
     public static final String AVC_VOLUME_KEY = "avc_volume_seekbar";
 
+    public static final String AUDIO_64BIT_KEY = "audio_64bit_switch";
+    public static final String DSD_REMASTER_KEY = "dsd_remaster_dropdown";
+    public static final String BIT_PERFECT_KEY = "bit_perfect_switch";
+    public static final String SAMPLE_RATE_KEY = "sample_rate_dropdown";
+
+    public static final String EQ_SWITCH_KEY = "eq_switch";
+    public static final String EQ_PRESET_KEY = "eq_preset_dropdown";
+    public static final String EQ_LOAD_PRESET_KEY = "eq_load_preset";
+    public static final String EQ_SAVE_PRESET_KEY = "eq_save_preset";
+    public static final String EQ_RESET_KEY = "eq_reset";
+    public static final String[] EQ_BAND_KEYS = {
+        "eq_band0", "eq_band1", "eq_band2", "eq_band3", "eq_band4",
+        "eq_band5", "eq_band6", "eq_band7", "eq_band8", "eq_band9"
+    };
+    public static final int[] EQ_BAND_FREQS = {
+        31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000
+    };
+    public static final int EQ_CUSTOM_PRESET_INDEX = 8;
+
     public static final String   CUSTOM_FILTER_SHAPE_KEY = "custom_filter_shape";
     public static final String   CUSTOM_FILTER_SYMMETRY_KEY = "custom_filter_symmetry";
     public static final String[] CUSTOM_FILTER_COEFF_KEYS = {
