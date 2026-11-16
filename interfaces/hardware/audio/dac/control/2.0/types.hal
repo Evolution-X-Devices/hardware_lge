@@ -29,7 +29,12 @@ enum Feature : int32_t {
     BalanceRight,
     HifiMode,
     AVCVolume,
-    CustomFilter
+    CustomFilter,
+    Audio64Bit,
+    DsdRemastering,
+    BitPerfect,
+    SampleRate,
+    Equalizer
 };
 
 struct KeyValue {

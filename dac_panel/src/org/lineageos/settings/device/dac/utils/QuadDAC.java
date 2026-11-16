@@ -65,6 +65,22 @@ public class QuadDAC {
                     setCustomFilterCoeff(i, custom_filter_coefficients[i]);
                 }
             }
+
+            if (dac_features.contains(Feature.Audio64Bit)) {
+                setAudio64Bit(isAudio64BitEnabled());
+            }
+            if (dac_features.contains(Feature.DsdRemastering)) {
+                setDsdRemastering(getDsdRemastering());
+            }
+            if (dac_features.contains(Feature.SampleRate)) {
+                setSampleRate(getSampleRate());
+            }
+            if (dac_features.contains(Feature.Equalizer)) {
+                setEqEnabled(isEqEnabled());
+            }
+            if (dac_features.contains(Feature.BitPerfect)) {
+                setBitPerfect(isBitPerfectEnabled());
+            }
         } catch(Exception e) {}
     }
 
@@ -191,5 +207,117 @@ public class QuadDAC {
     public static void resetCustomFilterCoeffs() throws RemoteException
     {
         dac.resetCustomFilterCoeffs();
+    }
+
+    public static void setAudio64Bit(boolean enable) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.Audio64Bit)) {
+            dac.setFeatureValue(Feature.Audio64Bit, enable ? 1 : 0);
+        }
+    }
+
+    public static boolean isAudio64BitEnabled() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.Audio64Bit)) {
+            return false;
+        }
+        return dac.getFeatureValue(Feature.Audio64Bit) != 0;
+    }
+
+    public static void setDsdRemastering(int mode) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.DsdRemastering)) {
+            dac.setFeatureValue(Feature.DsdRemastering, mode);
+        }
+    }
+
+    public static int getDsdRemastering() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.DsdRemastering)) {
+            return 0;
+        }
+        return dac.getFeatureValue(Feature.DsdRemastering);
+    }
+
+    public static void setBitPerfect(boolean enable) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.BitPerfect)) {
+            dac.setFeatureValue(Feature.BitPerfect, enable ? 1 : 0);
+        }
+    }
+
+    public static boolean isBitPerfectEnabled() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.BitPerfect)) {
+            return false;
+        }
+        return dac.getFeatureValue(Feature.BitPerfect) != 0;
+    }
+
+    public static void setSampleRate(int index) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.SampleRate)) {
+            dac.setFeatureValue(Feature.SampleRate, index);
+        }
+    }
+
+    public static int getSampleRate() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.SampleRate)) {
+            return 0;
+        }
+        return dac.getFeatureValue(Feature.SampleRate);
+    }
+
+    public static void setEqEnabled(boolean enable) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.Equalizer)) {
+            dac.setEqEnabled(enable);
+        }
+    }
+
+    public static boolean isEqEnabled() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.Equalizer)) {
+            return false;
+        }
+        return dac.getEqEnabled();
+    }
+
+    public static void setEqPreset(int preset) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.Equalizer)) {
+            dac.setEqPreset(preset);
+        }
+    }
+
+    public static int getEqPreset() throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.Equalizer)) {
+            return 0;
+        }
+        return dac.getEqPreset();
+    }
+
+    public static void setEqBandLevel(int band, int level) throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.Equalizer)) {
+            dac.setEqBandLevel(band, level);
+        }
+    }
+
+    public static int getEqBandLevel(int band) throws RemoteException
+    {
+        if (dac_features == null || !dac_features.contains(Feature.Equalizer)) {
+            return 0;
+        }
+        return dac.getEqBandLevel(band);
+    }
+
+    public static void resetEqBands() throws RemoteException
+    {
+        if (dac_features != null && dac_features.contains(Feature.Equalizer)) {
+            dac.resetEqBands();
+        }
     }
 }

@@ -37,4 +37,34 @@
         <item>@string/cf_symmetry_1</item>
     </string-array>
 
+    <string-array name="dsd_remaster_entries" translatable="false">
+        <item>@string/dsd_remaster_off</item>
+        <item>@string/dsd_remaster_dsd64</item>
+        <item>@string/dsd_remaster_dsd128</item>
+    </string-array>
+
+    <string-array name="sample_rate_entries" translatable="false">
+        <item>@string/sample_rate_auto</item>
+        <item>@string/sample_rate_44100</item>
+        <item>@string/sample_rate_48000</item>
+        <item>@string/sample_rate_88200</item>
+        <item>@string/sample_rate_96000</item>
+        <item>@string/sample_rate_176400</item>
+        <item>@string/sample_rate_192000</item>
+        <item>@string/sample_rate_352800</item>
+        <item>@string/sample_rate_384000</item>
+    </string-array>
+
+    <string-array name="eq_preset_entries" translatable="false">
+        <item>@string/eq_preset_flat</item>
+        <item>@string/eq_preset_bass_boost</item>
+        <item>@string/eq_preset_treble_boost</item>
+        <item>@string/eq_preset_vocal</item>
+        <item>@string/eq_preset_rock</item>
+        <item>@string/eq_preset_pop</item>
+        <item>@string/eq_preset_jazz</item>
+        <item>@string/eq_preset_classical</item>
+        <item>@string/eq_preset_custom</item>
+    </string-array>
+
 </resources>

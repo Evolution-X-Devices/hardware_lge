@@ -40,6 +40,13 @@ std::vector<std::string> PROPERTY_CUSTOM_FILTER_COEFFS = {
         "persist.vendor.audio.ess.customFilterCoeff12",
         "persist.vendor.audio.ess.customFilterCoeff13"};
 
+std::vector<std::string> PROPERTY_EQ_BANDS = {
+        "persist.vendor.audio.ess.eq_band0", "persist.vendor.audio.ess.eq_band1",
+        "persist.vendor.audio.ess.eq_band2", "persist.vendor.audio.ess.eq_band3",
+        "persist.vendor.audio.ess.eq_band4", "persist.vendor.audio.ess.eq_band5",
+        "persist.vendor.audio.ess.eq_band6", "persist.vendor.audio.ess.eq_band7",
+        "persist.vendor.audio.ess.eq_band8", "persist.vendor.audio.ess.eq_band9"};
+
 namespace vendor {
 namespace lge {
 namespace hardware {
@@ -51,6 +58,10 @@ namespace implementation {
 
 static constexpr int32_t MAX_BALANCE_VALUE = 0;
 static constexpr int32_t MIN_BALANCE_VALUE = -12;
+static constexpr int32_t EQ_BAND_COUNT = 10;
+static constexpr int32_t EQ_MIN_DB = -12;
+static constexpr int32_t EQ_MAX_DB = 12;
+static constexpr int32_t EQ_CUSTOM_PRESET_INDEX = 8;
 
 static std::vector<KeyValue> sound_presets = {
         {"Normal", "0"}, {"Enhanced", "1"}, {"Detailed", "2"}, {"Live", "3"}, {"Bass", "4"}};
@@ -59,6 +70,31 @@ static std::vector<KeyValue> digital_filters = {{"Short", "0"}, {"Sharp", "1"}, 
 
 static std::vector<KeyValue> hifi_modes = {
         {"Normal", "0"}, {"High Impedance", "1"}, {"AUX High Impedance", "2"}};
+
+static std::vector<KeyValue> audio_64bit_modes = {{"Off", "0"}, {"32-bit PCM", "1"}};
+
+static std::vector<KeyValue> dsd_remaster_modes = {
+        {"Off", "0"}, {"DSD64 (2.8 MHz)", "1"}, {"DSD128 (5.6 MHz)", "2"}};
+
+static std::vector<KeyValue> bit_perfect_modes = {{"Off", "0"}, {"Bit-Perfect", "1"}};
+
+static std::vector<KeyValue> sample_rate_modes = {
+        {"Auto (Native)", "0"}, {"44.1 kHz", "44100"},  {"48 kHz", "48000"},
+        {"88.2 kHz", "88200"},  {"96 kHz", "96000"},    {"176.4 kHz", "176400"},
+        {"192 kHz", "192000"},  {"352.8 kHz", "352800"}, {"384 kHz", "384000"}};
+
+static const int32_t EQ_PRESETS[][EQ_BAND_COUNT] = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},       // 0: Flat
+        {6, 5, 4, 2, 0, 0, 0, 0, 0, 0},       // 1: Bass Boost
+        {0, 0, 0, 0, 0, 1, 2, 4, 5, 6},       // 2: Treble Boost
+        {-2, -1, 0, 2, 4, 4, 3, 1, 0, -1},    // 3: Vocal
+        {4, 3, 2, 0, -1, -1, 1, 3, 4, 4},     // 4: Rock
+        {-1, 1, 3, 4, 2, 0, -1, 1, 2, 2},     // 5: Pop
+        {3, 2, 1, 2, -1, -1, 0, 1, 2, 3},     // 6: Jazz
+        {4, 3, 2, 0, 0, 0, 0, 2, 3, 4},       // 7: Classical
+};
+static constexpr int32_t EQ_PRESET_COUNT =
+        static_cast<int32_t>(sizeof(EQ_PRESETS) / sizeof(EQ_PRESETS[0]));
 
 /*
  * Write value to path and close file. Returns false if the write failed.
@@ -223,6 +259,23 @@ DacControl::DacControl() {
         setCustomFilterSymmetry(getCustomFilterSymmetry());
         for (int i = 0; i < 14; i++) setCustomFilterCoeff(i, getCustomFilterCoeff(i));
     }
+
+    /* Bit-Perfect Audio */
+    mSupportedFeatures.push_back(Feature::BitPerfect);
+    FeatureStates bitperfect_fstates;
+    bitperfect_fstates.states = hidl_vec<KeyValue>{bit_perfect_modes};
+    mSupportedStates.emplace(Feature::BitPerfect, bitperfect_fstates);
+
+    /* DAC-only 10-band Equalizer */
+    mSupportedFeatures.push_back(Feature::Equalizer);
+    FeatureStates eq_fstates;
+    eq_fstates.range.min = EQ_MIN_DB;
+    eq_fstates.range.max = EQ_MAX_DB;
+    eq_fstates.range.step = 1;
+    mSupportedStates.emplace(Feature::Equalizer, eq_fstates);
+
+    /* Apply DAC-dependent features only if the Hi-Fi DAC is currently enabled */
+    applyDacDependentFeatures(getHifiDacState());
 }
 
 Return<void> DacControl::getSupportedFeatures(getSupportedFeatures_cb _hidl_cb) {
@@ -328,7 +381,11 @@ Return<bool> DacControl::setHifiDacState(bool enable) {
     KeyValue kv;
     kv.name = DAC_COMMAND;
     kv.value = enable ? SET_DAC_ON_COMMAND : SET_DAC_OFF_COMMAND;
-    return setAudioHALParameters(kv);
+    bool rc = setAudioHALParameters(kv);
+    if (rc) {
+        applyDacDependentFeatures(enable);
+    }
+    return rc;
 }
 
 bool DacControl::setDigitalFilterState(int32_t value) {
@@ -399,6 +456,18 @@ Return<bool> DacControl::setFeatureValue(Feature feature, int32_t value) {
         case Feature::HifiMode: {
             return writeHifiModeState(value);
         }
+        case Feature::Audio64Bit: {
+            return applyAudio64Bit(value);
+        }
+        case Feature::DsdRemastering: {
+            return applyDsdRemastering(value);
+        }
+        case Feature::BitPerfect: {
+            return applyBitPerfect(value);
+        }
+        case Feature::SampleRate: {
+            return applySampleRate(value);
+        }
         default:
             return false;
     }
@@ -460,6 +529,22 @@ Return<int32_t> DacControl::getFeatureValue(Feature feature) {
         case Feature::HifiMode: {
             property = PROPERTY_HIFI_DAC_MODE;
             property_default_value = HIFI_MODE_DEFAULT;
+            break;
+        }
+        case Feature::Audio64Bit: {
+            property = PROPERTY_AUDIO_64BIT;
+            break;
+        }
+        case Feature::DsdRemastering: {
+            property = PROPERTY_DSD_REMASTER;
+            break;
+        }
+        case Feature::BitPerfect: {
+            property = PROPERTY_BIT_PERFECT;
+            break;
+        }
+        case Feature::SampleRate: {
+            property = PROPERTY_SAMPLE_RATE;
             break;
         }
         default:
@@ -583,6 +668,210 @@ Return<bool> DacControl::resetCustomFilterCoeffs() {
     set(customFilterPath, parseUpdatedCustomFilterData());
 
     return true;
+}
+
+bool DacControl::applyAudio64Bit(int32_t value) {
+    if (value < 0 || value >= static_cast<int32_t>(audio_64bit_modes.size())) {
+        LOG(ERROR) << "DacControl::applyAudio64Bit: Invalid value " << value;
+        return false;
+    }
+    if (property_set(PROPERTY_AUDIO_64BIT, std::to_string(value).c_str()) != 0) {
+        return false;
+    }
+    if (!getHifiDacState()) {
+        return true;
+    }
+    KeyValue kv;
+    kv.name = SET_AUDIO_64BIT_COMMAND;
+    kv.value = std::to_string(value);
+    return setAudioHALParameters(kv);
+}
+
+bool DacControl::applyDsdRemastering(int32_t value) {
+    if (value < 0 || value >= static_cast<int32_t>(dsd_remaster_modes.size())) {
+        LOG(ERROR) << "DacControl::applyDsdRemastering: Invalid value " << value;
+        return false;
+    }
+    if (property_set(PROPERTY_DSD_REMASTER, std::to_string(value).c_str()) != 0) {
+        return false;
+    }
+    if (!getHifiDacState()) {
+        return true;
+    }
+    KeyValue dopKv;
+    dopKv.name = SET_DSD_DOP_COMMAND;
+    dopKv.value = value > 0 ? "1" : "0";
+    bool ok = setAudioHALParameters(dopKv);
+
+    KeyValue dsdKv;
+    dsdKv.name = SET_DSD_REMASTER_COMMAND;
+    dsdKv.value = std::to_string(value);
+    return setAudioHALParameters(dsdKv) && ok;
+}
+
+bool DacControl::applySampleRate(int32_t value) {
+    if (value < 0 || value >= static_cast<int32_t>(sample_rate_modes.size())) {
+        LOG(ERROR) << "DacControl::applySampleRate: Invalid value " << value;
+        return false;
+    }
+    if (property_set(PROPERTY_SAMPLE_RATE, std::to_string(value).c_str()) != 0) {
+        return false;
+    }
+    if (!getHifiDacState()) {
+        return true;
+    }
+    // Bit-Perfect mode forces native sample rate without resampling
+    bool bitPerfect = property_get_int32(PROPERTY_BIT_PERFECT, 0) != 0;
+    KeyValue kv;
+    kv.name = SET_SAMPLE_RATE_COMMAND;
+    kv.value = bitPerfect ? "0" : sample_rate_modes[value].value;
+    return setAudioHALParameters(kv);
+}
+
+bool DacControl::applyBitPerfect(int32_t value) {
+    int32_t normalized = value ? 1 : 0;
+    if (property_set(PROPERTY_BIT_PERFECT, std::to_string(normalized).c_str()) != 0) {
+        return false;
+    }
+    if (!getHifiDacState()) {
+        return true;
+    }
+    KeyValue bpKv;
+    bpKv.name = SET_BIT_PERFECT_COMMAND;
+    bpKv.value = std::to_string(normalized);
+    bool ok = setAudioHALParameters(bpKv);
+
+    if (normalized) {
+        // Bypass EQ, SoundPreset, digital AVC attenuation, and L/R balance attenuation
+        KeyValue eqKv{SET_GEQ_ON_COMMAND, "0"};
+        setAudioHALParameters(eqKv);
+        KeyValue spKv{SET_SOUND_PRESET_COMMAND, "0"};
+        setAudioHALParameters(spKv);
+        if (!avcPath.empty()) {
+            set(avcPath, 0);
+        }
+        if (!volumeLeftPath.empty()) {
+            set(volumeLeftPath, 0);
+        }
+        if (!volumeRightPath.empty()) {
+            set(volumeRightPath, 0);
+        }
+    } else {
+        // Restore user's saved DAC DSP settings
+        if (std::find(mSupportedFeatures.begin(), mSupportedFeatures.end(), Feature::SoundPreset) !=
+            mSupportedFeatures.end()) {
+            KeyValue spKv{SET_SOUND_PRESET_COMMAND,
+                          std::to_string(getFeatureValue(Feature::SoundPreset))};
+            setAudioHALParameters(spKv);
+        }
+        if (!avcPath.empty()) {
+            set(avcPath, (-1) * getFeatureValue(Feature::AVCVolume));
+        }
+        if (!volumeLeftPath.empty()) {
+            set(volumeLeftPath, getFeatureValue(Feature::BalanceLeft));
+        }
+        if (!volumeRightPath.empty()) {
+            set(volumeRightPath, getFeatureValue(Feature::BalanceRight));
+        }
+        applyEqState();
+    }
+    return ok;
+}
+
+bool DacControl::applyEqState() {
+    bool dacOn = getHifiDacState();
+    bool bitPerfect = property_get_int32(PROPERTY_BIT_PERFECT, 0) != 0;
+    bool eqOn = dacOn && !bitPerfect && (property_get_int32(PROPERTY_EQ_ENABLED, 0) != 0);
+
+    if (!eqOn) {
+        KeyValue eqKv{SET_GEQ_ON_COMMAND, "0"};
+        return setAudioHALParameters(eqKv);
+    }
+
+    int32_t preset = property_get_int32(PROPERTY_EQ_PRESET, 0);
+    KeyValue presetKv{SET_GEQ_PRESET_COMMAND, std::to_string(preset)};
+    setAudioHALParameters(presetKv);
+
+    for (int32_t i = 0; i < EQ_BAND_COUNT; i++) {
+        int32_t level = property_get_int32(PROPERTY_EQ_BANDS.at(i).c_str(), 0);
+        KeyValue bandKv;
+        bandKv.name = std::string(SET_GEQ_BAND_PREFIX) + std::to_string(i + 1);
+        bandKv.value = std::to_string(level);
+        setAudioHALParameters(bandKv);
+    }
+
+    KeyValue eqKv{SET_GEQ_ON_COMMAND, "1"};
+    return setAudioHALParameters(eqKv);
+}
+
+void DacControl::applyDacDependentFeatures(bool dacEnabled) {
+    if (!dacEnabled) {
+        setAudioHALParameters({SET_AUDIO_64BIT_COMMAND, "0"});
+        setAudioHALParameters({SET_DSD_DOP_COMMAND, "0"});
+        setAudioHALParameters({SET_DSD_REMASTER_COMMAND, "0"});
+        setAudioHALParameters({SET_BIT_PERFECT_COMMAND, "0"});
+        setAudioHALParameters({SET_SAMPLE_RATE_COMMAND, "0"});
+        setAudioHALParameters({SET_GEQ_ON_COMMAND, "0"});
+        setAudioHALParameters({SET_SOUND_PRESET_COMMAND, "0"});
+        return;
+    }
+
+    applyBitPerfect(property_get_int32(PROPERTY_BIT_PERFECT, 0));
+}
+
+Return<bool> DacControl::getEqEnabled() {
+    return property_get_int32(PROPERTY_EQ_ENABLED, 0) != 0;
+}
+
+Return<bool> DacControl::setEqEnabled(bool enable) {
+    if (property_set(PROPERTY_EQ_ENABLED, enable ? "1" : "0") != 0) {
+        return false;
+    }
+    return applyEqState();
+}
+
+Return<int32_t> DacControl::getEqPreset() {
+    return property_get_int32(PROPERTY_EQ_PRESET, 0);
+}
+
+Return<bool> DacControl::setEqPreset(int32_t preset) {
+    if (preset < 0 || preset > EQ_CUSTOM_PRESET_INDEX) {
+        LOG(ERROR) << "DacControl::setEqPreset: Invalid preset " << preset;
+        return false;
+    }
+    if (property_set(PROPERTY_EQ_PRESET, std::to_string(preset).c_str()) != 0) {
+        return false;
+    }
+    if (preset < EQ_PRESET_COUNT) {
+        for (int32_t i = 0; i < EQ_BAND_COUNT; i++) {
+            property_set(PROPERTY_EQ_BANDS.at(i).c_str(),
+                         std::to_string(EQ_PRESETS[preset][i]).c_str());
+        }
+    }
+    return applyEqState();
+}
+
+Return<int32_t> DacControl::getEqBandLevel(int32_t band) {
+    if (band < 0 || band >= EQ_BAND_COUNT) {
+        return 0;
+    }
+    return property_get_int32(PROPERTY_EQ_BANDS.at(band).c_str(), 0);
+}
+
+Return<bool> DacControl::setEqBandLevel(int32_t band, int32_t level) {
+    if (band < 0 || band >= EQ_BAND_COUNT) {
+        LOG(ERROR) << "DacControl::setEqBandLevel: Invalid band " << band;
+        return false;
+    }
+    int32_t clamped = std::max(EQ_MIN_DB, std::min(EQ_MAX_DB, level));
+    if (property_set(PROPERTY_EQ_BANDS.at(band).c_str(), std::to_string(clamped).c_str()) != 0) {
+        return false;
+    }
+    return applyEqState();
+}
+
+Return<bool> DacControl::resetEqBands() {
+    return setEqPreset(0);
 }
 
 }  // namespace implementation
