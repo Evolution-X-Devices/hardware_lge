@@ -37,6 +37,10 @@
         </activity>
 
         <service
+            android:name=".DacDspService"
+            android:exported="false" />
+
+        <service
             android:name=".QuadDACTileService"
             android:icon="@drawable/ic_quad_dac_icon"
             android:label="@string/quad_dac"

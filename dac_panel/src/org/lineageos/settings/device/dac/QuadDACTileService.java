@@ -29,6 +29,7 @@ public class QuadDACTileService extends TileService {
                 DacControlInterface.enable();
                 setTileActive();
             }
+            DacDspService.sync(this);
         } catch(Exception e) {}
     }
 

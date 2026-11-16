@@ -87,4 +87,39 @@ interface IDacControl {
     * Resets all coefficients for the custom ESS filter
     */
     resetCustomFilterCoeffs() generates (bool rc);
+
+    /**
+    * Returns whether the DAC-only 10-band Equalizer is enabled
+    */
+    getEqEnabled() generates (bool enabled);
+
+    /**
+    * Enables or disables the DAC-only 10-band Equalizer
+    */
+    setEqEnabled(bool enable) generates (bool rc);
+
+    /**
+    * Returns the active EQ preset index
+    */
+    getEqPreset() generates (int32_t preset);
+
+    /**
+    * Sets and applies an EQ preset index (loads preset band levels)
+    */
+    setEqPreset(int32_t preset) generates (bool rc);
+
+    /**
+    * Returns the gain (in dB, -12..12) for the given EQ band index (0..9)
+    */
+    getEqBandLevel(int32_t band) generates (int32_t level);
+
+    /**
+    * Sets and applies the gain (in dB, -12..12) for the given EQ band index (0..9)
+    */
+    setEqBandLevel(int32_t band, int32_t level) generates (bool rc);
+
+    /**
+    * Resets all EQ bands to 0 dB (Flat)
+    */
+    resetEqBands() generates (bool rc);
 };

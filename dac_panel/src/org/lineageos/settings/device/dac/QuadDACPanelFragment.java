@@ -1,10 +1,13 @@
 package org.lineageos.settings.device.dac;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import androidx.preference.Preference;
@@ -18,13 +21,17 @@ import androidx.preference.SeekBarPreference;
 
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.lineageos.settings.device.dac.ui.BalancePreference;
 import org.lineageos.settings.device.dac.ui.ButtonPreference;
 import org.lineageos.settings.device.dac.utils.Constants;
+import org.lineageos.settings.device.dac.utils.EqPresetManager;
 import org.lineageos.settings.device.dac.utils.QuadDAC;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import vendor.lge.hardware.audio.dac.control.V2_0.Feature;
 import vendor.lge.hardware.audio.dac.control.V2_0.IDacControl;
@@ -34,11 +41,15 @@ public class QuadDACPanelFragment extends PreferenceFragment
         implements OnPreferenceChangeListener {
 
     private static final String TAG = "QuadDACPanelFragment";
+    private static final int REQUEST_LOAD_EQ_PRESET = 1001;
 
     private QuadDAC DacControlInterface = new QuadDAC();
 
-    private SwitchPreference quaddac_switch;
+    private SwitchPreference quaddac_switch, bit_perfect_switch, eq_switch;
     private ListPreference sound_preset_list, digital_filter_list, mode_list;
+    private ListPreference eq_preset_list;
+    private Preference eq_load_preset_pref, eq_save_preset_pref, eq_reset_pref;
+    private SeekBarPreference[] eq_bands = new SeekBarPreference[10];
     private BalancePreference balance_preference;
     private SeekBarPreference avc_volume;
 
@@ -78,18 +89,31 @@ public class QuadDACPanelFragment extends PreferenceFragment
 
         try {
             if (preference instanceof SwitchPreference) {
+                String key = preference.getKey();
+                boolean enabled = (boolean) newValue;
 
-                boolean set_dac_on = (boolean) newValue;
-
-                if (set_dac_on) {
-                    DacControlInterface.enable();
-                    enableExtraSettings();
+                if (Constants.DAC_SWITCH_KEY.equals(key)) {
+                    if (enabled) {
+                        DacControlInterface.enable();
+                        enableExtraSettings();
+                    } else {
+                        DacControlInterface.disable();
+                        disableExtraSettings();
+                    }
+                    DacDspService.sync(getContext());
                     return true;
-                } else {
-                    DacControlInterface.disable();
-                    disableExtraSettings();
+                } else if (Constants.BIT_PERFECT_KEY.equals(key)) {
+                    DacControlInterface.setBitPerfect(enabled);
+                    applyBitPerfectUiState(enabled);
+                    DacDspService.sync(getContext());
+                    return true;
+                } else if (Constants.EQ_SWITCH_KEY.equals(key)) {
+                    DacControlInterface.setEqEnabled(enabled);
+                    updateEqControlsEnabled(enabled && !bit_perfect_switch.isChecked());
+                    DacDspService.sync(getContext());
                     return true;
                 }
+                return false;
             }
             if (preference instanceof ListPreference) {
                 if (preference.getKey().equals(Constants.HIFI_MODE_KEY)) {
@@ -135,6 +159,13 @@ public class QuadDACPanelFragment extends PreferenceFragment
                     DacControlInterface.setCustomFilterSymmetry(filter_symmetry);
                     return true;
 
+                } else if (preference.getKey().equals(Constants.EQ_PRESET_KEY)) {
+                    ListPreference lp = (ListPreference) preference;
+                    int preset = lp.findIndexOfValue((String) newValue);
+                    DacControlInterface.setEqPreset(preset);
+                    refreshEqBandsFromHal();
+                    DacDspService.sync(getContext());
+                    return true;
                 }
                 return false;
             }
@@ -143,16 +174,26 @@ public class QuadDACPanelFragment extends PreferenceFragment
                 if (preference.getKey().equals(Constants.AVC_VOLUME_KEY)) {
                     if (newValue instanceof Integer) {
                         Integer avc_vol = (Integer) newValue;
-
-                        //avc_volume.setSummary( ((double)avc_vol) + " db");
-
                         DacControlInterface.setAVCVolume(avc_vol);
                         return true;
                     } else {
                         return false;
                     }
-                }
-                else { /* This assumes the only other seekbars are for the custom filter. Extend as needed. */
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        if (preference.getKey().equals(Constants.EQ_BAND_KEYS[i])) {
+                            if (newValue instanceof Integer) {
+                                int level = (Integer) newValue;
+                                DacControlInterface.setEqBandLevel(i, level);
+                                DacControlInterface.setEqPreset(Constants.EQ_CUSTOM_PRESET_INDEX);
+                                eq_preset_list.setValueIndex(Constants.EQ_CUSTOM_PRESET_INDEX);
+                                setEqBandSummary(i, level);
+                                DacDspService.sync(getContext());
+                                return true;
+                            }
+                            return false;
+                        }
+                    }
                     for(int i = 0; i < 14; i++) {
                         if(preference.getKey().equals(Constants.CUSTOM_FILTER_COEFF_KEYS[i]))
                         {
@@ -226,6 +267,45 @@ public class QuadDACPanelFragment extends PreferenceFragment
 
         balance_preference = (BalancePreference) findPreference(Constants.BALANCE_KEY);
 
+        bit_perfect_switch = (SwitchPreference) findPreference(Constants.BIT_PERFECT_KEY);
+        bit_perfect_switch.setOnPreferenceChangeListener(this);
+
+        eq_switch = (SwitchPreference) findPreference(Constants.EQ_SWITCH_KEY);
+        eq_switch.setOnPreferenceChangeListener(this);
+
+        eq_preset_list = (ListPreference) findPreference(Constants.EQ_PRESET_KEY);
+        eq_preset_list.setOnPreferenceChangeListener(this);
+
+        eq_load_preset_pref = findPreference(Constants.EQ_LOAD_PRESET_KEY);
+        eq_load_preset_pref.setOnPreferenceClickListener(p -> {
+            showLoadPresetDialog();
+            return true;
+        });
+
+        eq_save_preset_pref = findPreference(Constants.EQ_SAVE_PRESET_KEY);
+        eq_save_preset_pref.setOnPreferenceClickListener(p -> {
+            showSavePresetDialog();
+            return true;
+        });
+
+        eq_reset_pref = findPreference(Constants.EQ_RESET_KEY);
+        eq_reset_pref.setOnPreferenceClickListener(p -> {
+            try {
+                DacControlInterface.resetEqBands();
+                eq_preset_list.setValueIndex(0);
+                refreshEqBandsFromHal();
+                DacDspService.sync(getContext());
+            } catch (Exception e) {
+                Log.d(TAG, "eq_reset: " + e.toString());
+            }
+            return true;
+        });
+
+        for (int i = 0; i < 10; i++) {
+            eq_bands[i] = (SeekBarPreference) findPreference(Constants.EQ_BAND_KEYS[i]);
+            eq_bands[i].setOnPreferenceChangeListener(this);
+        }
+
         try {
             if (DacControlInterface.getSupportedFeatures().contains(Feature.QuadDAC)) {
                 quaddac_switch.setVisible(true);
@@ -265,6 +345,23 @@ public class QuadDACPanelFragment extends PreferenceFragment
                     setCoeffSummary(i, DacControlInterface.getCustomFilterCoeff(i));
                 }
             }
+            if (DacControlInterface.getSupportedFeatures().contains(Feature.BitPerfect)) {
+                bit_perfect_switch.setVisible(true);
+                bit_perfect_switch.setChecked(DacControlInterface.isBitPerfectEnabled());
+            }
+            if (DacControlInterface.getSupportedFeatures().contains(Feature.Equalizer)) {
+                eq_switch.setVisible(true);
+                eq_switch.setChecked(DacControlInterface.isEqEnabled());
+                eq_preset_list.setVisible(true);
+                eq_preset_list.setValueIndex(DacControlInterface.getEqPreset());
+                eq_load_preset_pref.setVisible(true);
+                eq_save_preset_pref.setVisible(true);
+                eq_reset_pref.setVisible(true);
+                for (int i = 0; i < 10; i++) {
+                    eq_bands[i].setVisible(true);
+                }
+                refreshEqBandsFromHal();
+            }
         } catch(Exception e) {
             Log.d(TAG, "addPreferencesFromResource: " + e.toString());
         }
@@ -302,6 +399,12 @@ public class QuadDACPanelFragment extends PreferenceFragment
             sound_preset_list.setEnabled(true);
         if(supportedFeatures.contains(Feature.CustomFilter))
             enableCustomFilter();
+        if (supportedFeatures.contains(Feature.BitPerfect))
+            bit_perfect_switch.setEnabled(true);
+        if (supportedFeatures.contains(Feature.Equalizer))
+            eq_switch.setEnabled(true);
+
+        applyBitPerfectUiState(bit_perfect_switch.isChecked());
     }
 
     private void disableExtraSettings()
@@ -311,7 +414,140 @@ public class QuadDACPanelFragment extends PreferenceFragment
         avc_volume.setEnabled(false);
         balance_preference.setEnabled(false);
         sound_preset_list.setEnabled(false);
+        bit_perfect_switch.setEnabled(false);
+        eq_switch.setEnabled(false);
+        updateEqControlsEnabled(false);
         disableCustomFilter();
+    }
+
+    private void applyBitPerfectUiState(boolean bitPerfect) {
+        if (!quaddac_switch.isChecked() || !quaddac_switch.isEnabled()) {
+            return;
+        }
+        boolean dspAllowed = !bitPerfect;
+        avc_volume.setEnabled(dspAllowed);
+        balance_preference.setEnabled(dspAllowed);
+        if (DacControlInterface.getSupportedFeatures().contains(Feature.SoundPreset)) {
+            sound_preset_list.setEnabled(dspAllowed);
+        }
+        if (DacControlInterface.getSupportedFeatures().contains(Feature.Equalizer)) {
+            eq_switch.setEnabled(dspAllowed);
+            updateEqControlsEnabled(dspAllowed && eq_switch.isChecked());
+        }
+    }
+
+    private void updateEqControlsEnabled(boolean enabled) {
+        eq_preset_list.setEnabled(enabled);
+        eq_load_preset_pref.setEnabled(enabled);
+        eq_save_preset_pref.setEnabled(enabled);
+        eq_reset_pref.setEnabled(enabled);
+        for (int i = 0; i < 10; i++) {
+            eq_bands[i].setEnabled(enabled);
+        }
+    }
+
+    private void setEqBandSummary(int index, int levelDb) {
+        eq_bands[index].setValue(levelDb);
+        eq_bands[index].setSummary((levelDb > 0 ? "+" : "") + levelDb + " dB");
+    }
+
+    private void refreshEqBandsFromHal() {
+        try {
+            for (int i = 0; i < 10; i++) {
+                setEqBandSummary(i, DacControlInterface.getEqBandLevel(i));
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "refreshEqBandsFromHal: " + e.toString());
+        }
+    }
+
+    private void applyEqBands(int[] bands) {
+        try {
+            for (int i = 0; i < 10; i++) {
+                DacControlInterface.setEqBandLevel(i, bands[i]);
+                setEqBandSummary(i, bands[i]);
+            }
+            DacControlInterface.setEqPreset(Constants.EQ_CUSTOM_PRESET_INDEX);
+            eq_preset_list.setValueIndex(Constants.EQ_CUSTOM_PRESET_INDEX);
+            DacDspService.sync(getContext());
+        } catch (Exception e) {
+            Log.d(TAG, "applyEqBands: " + e.toString());
+        }
+    }
+
+    private void showLoadPresetDialog() {
+        Context ctx = getContext();
+        Map<String, int[]> saved = EqPresetManager.getSavedPresets(ctx);
+        ArrayList<String> labels = new ArrayList<>(saved.keySet());
+        labels.add(getString(R.string.eq_load_from_file));
+
+        String[] items = labels.toArray(new String[0]);
+        new AlertDialog.Builder(ctx)
+                .setTitle(R.string.eq_load_preset)
+                .setItems(items, (dialog, which) -> {
+                    if (which == items.length - 1) {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("*/*");
+                        startActivityForResult(intent, REQUEST_LOAD_EQ_PRESET);
+                    } else {
+                        String name = items[which];
+                        int[] bands = saved.get(name);
+                        if (bands != null) {
+                            applyEqBands(bands);
+                            Toast.makeText(ctx, getString(R.string.eq_preset_loaded, name),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .show();
+    }
+
+    private void showSavePresetDialog() {
+        Context ctx = getContext();
+        final EditText input = new EditText(ctx);
+        input.setHint(R.string.eq_save_dialog_hint);
+        new AlertDialog.Builder(ctx)
+                .setTitle(R.string.eq_save_dialog_title)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String name = input.getText().toString().trim();
+                    if (!name.isEmpty()) {
+                        int[] bands = new int[10];
+                        try {
+                            for (int i = 0; i < 10; i++) {
+                                bands[i] = DacControlInterface.getEqBandLevel(i);
+                            }
+                            EqPresetManager.savePreset(ctx, name, bands);
+                            Toast.makeText(ctx, getString(R.string.eq_preset_saved, name),
+                                    Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Log.d(TAG, "showSavePresetDialog: " + e.toString());
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_LOAD_EQ_PRESET && resultCode == Activity.RESULT_OK
+                && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+            try {
+                EqPresetManager.EqPreset preset = EqPresetManager.loadPresetFromUri(getContext(), uri);
+                applyEqBands(preset.bands);
+                EqPresetManager.savePreset(getContext(), preset.name, preset.bands);
+                Toast.makeText(getContext(), getString(R.string.eq_preset_loaded, preset.name),
+                        Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to load EQ preset", e);
+                Toast.makeText(getContext(), R.string.eq_preset_load_failed,
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void enableCustomFilter()

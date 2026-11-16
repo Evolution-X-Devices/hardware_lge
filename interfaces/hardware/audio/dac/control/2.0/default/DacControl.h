@@ -79,6 +79,20 @@ class DacControl : public IDacControl {
 
     Return<bool> resetCustomFilterCoeffs() override;
 
+    Return<bool> getEqEnabled() override;
+
+    Return<bool> setEqEnabled(bool enable) override;
+
+    Return<int32_t> getEqPreset() override;
+
+    Return<bool> setEqPreset(int32_t preset) override;
+
+    Return<int32_t> getEqBandLevel(int32_t band) override;
+
+    Return<bool> setEqBandLevel(int32_t band, int32_t level) override;
+
+    Return<bool> resetEqBands() override;
+
     std::map<Feature, FeatureStates> mSupportedStates;
     std::vector<Feature> mSupportedFeatures;
 
@@ -90,6 +104,12 @@ class DacControl : public IDacControl {
     bool setAudioHALParameters(KeyValue kv);
     bool setDigitalFilterState(int32_t value);
     bool setVolumeBalance(Feature direction, int32_t value);
+    bool applyAudio64Bit(int32_t value);
+    bool applyDsdRemastering(int32_t value);
+    bool applyBitPerfect(int32_t value);
+    bool applySampleRate(int32_t value);
+    bool applyEqState();
+    void applyDacDependentFeatures(bool dacEnabled);
     std::string parseUpdatedCustomFilterData();
 
     android::sp<::android::hardware::audio::V5_0::IDevice> mAudioDevice_V5_0;
